@@ -15,6 +15,8 @@
       padding: 10px;
       border-radius: 5px;
       max-width: 200px;
+      max-height: 90vh; /* 限制最大高度，防止超出屏幕 */
+      overflow-y: auto; /* 启用滚动 */
     }
     #controls input, #controls button {
       display: block;
@@ -27,12 +29,19 @@
 <body>
   <canvas id="webgl-canvas"></canvas>
   <div id="controls">
-    <button id="add-cube">Add Cube</button>
-    <button id="add-sphere">Add Sphere</button>
-    <button id="add-cylinder">Add Cylinder</button>
-    <!-- ȥ���� Add Glowing Sphere ��ť -->
+    <p>使用 W/A/S/D 四向移动</p>
+    <p>使用 Q/E 上下移动</p>
+    <p>使用 鼠标拖动调整视角</p>
+    <button id="add-cube">添加正方体</button>
+    <button id="add-sphere">添加球体</button>
+    <button id="add-cylinder">添加圆柱体</button>
+    <p>注意，如果你点击添加发现无事发生，那他大概率是被藏在了上一个模型的内部，改变大小或者位置即可发现他。</p>
+    <!-- 新增光照强度滑块 -->
     <label>
-      Size:
+      调整光照强度:
+      <input type="range" id="lightIntensity" min="0" max="3" step="0.1" value="1">
+    <label>
+      改变当前物体的大小:
       <input type="range" id="size" min="0.1" max="5" step="0.1" value="1">
     </label>
     <label>
@@ -60,18 +69,14 @@
       <input type="number" id="rotationZ" step="1" value="0">
     </label>
     <label>
-      Watermark:
+      输入你想隐藏的水印:
       <input type="text" id="watermark" placeholder="Enter watermark">
     </label>
-    <!-- ��������ǿ�Ȼ��� -->
-    <label>
-      Light Intensity:
-      <input type="range" id="lightIntensity" min="0" max="3" step="0.1" value="1">
     </label>
-    <button id="export">Export OBJ</button>
+    <button id="export">导出带数字水印的模型文件</button>
+    <p>以下两步提取水印</p>
     <input type="file" id="uploadModel" accept=".obj">
-    <button id="extractWatermark">Extract Watermark</button>
-    <p>ʹ�� W/A/S/D �ƶ���Q/E ���£�����϶������ӽ�</p>
+    <button id="extractWatermark">提取改obj文件的水印</button>
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.4.0/gl-matrix.js"></script>
   <script src="app.js"></script>
