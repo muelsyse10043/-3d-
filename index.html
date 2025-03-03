@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebGL 3D Models with Camera & Light Intensity</title>
+  <style>
+    body { margin: 0; overflow: hidden; }
+    #webgl-canvas { display: block; }
+    #controls {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(207, 255, 216, 0.8);
+      padding: 10px;
+      border-radius: 5px;
+      max-width: 200px;
+    }
+    #controls input, #controls button {
+      display: block;
+      margin-bottom: 10px;
+      width: 100%;
+    }
+    #export { margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <canvas id="webgl-canvas"></canvas>
+  <div id="controls">
+    <button id="add-cube">Add Cube</button>
+    <button id="add-sphere">Add Sphere</button>
+    <button id="add-cylinder">Add Cylinder</button>
+    <!-- 去掉了 Add Glowing Sphere 按钮 -->
+    <label>
+      Size:
+      <input type="range" id="size" min="0.1" max="5" step="0.1" value="1">
+    </label>
+    <label>
+      Position X:
+      <input type="number" id="positionX" step="0.1" value="0">
+    </label>
+    <label>
+      Position Y:
+      <input type="number" id="positionY" step="0.1" value="0">
+    </label>
+    <label>
+      Position Z:
+      <input type="number" id="positionZ" step="0.1" value="-5">
+    </label>
+    <label>
+      Rotation X:
+      <input type="number" id="rotationX" step="1" value="0">
+    </label>
+    <label>
+      Rotation Y:
+      <input type="number" id="rotationY" step="1" value="0">
+    </label>
+    <label>
+      Rotation Z:
+      <input type="number" id="rotationZ" step="1" value="0">
+    </label>
+    <label>
+      Watermark:
+      <input type="text" id="watermark" placeholder="Enter watermark">
+    </label>
+    <!-- 新增光照强度滑块 -->
+    <label>
+      Light Intensity:
+      <input type="range" id="lightIntensity" min="0" max="3" step="0.1" value="1">
+    </label>
+    <button id="export">Export OBJ</button>
+    <input type="file" id="uploadModel" accept=".obj">
+    <button id="extractWatermark">Extract Watermark</button>
+    <p>使用 W/A/S/D 移动，Q/E 上下，鼠标拖动调整视角</p>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.4.0/gl-matrix.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
