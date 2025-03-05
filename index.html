@@ -1,86 +1,141 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WebGL 3D Models with Camera & Light Intensity</title>
-  <style>
-    body { margin: 0; overflow: hidden; }
-    #webgl-canvas { display: block; }
-    #controls {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      background: rgba(207, 255, 216, 0.8);
-      padding: 10px;
-      border-radius: 5px;
-      max-width: 200px;
-      max-height: 90vh; /* 限制最大高度，防止超出屏幕 */
-      overflow-y: auto; /* 启用滚动 */
-    }
-    #controls input, #controls button {
-      display: block;
-      margin-bottom: 10px;
-      width: 100%;
-    }
-    #export { margin-top: 10px; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WYC的在线建模编辑器</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+
+        #webgl-canvas {
+            display: block;
+        }
+
+        /* 左侧控制面板 */
+        #controls {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(207, 255, 216, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            max-width: 200px;
+            max-height: 90vh; /* 限制最大高度，防止超出屏幕 */
+            overflow-y: auto; /* 启用滚动 */
+        }
+
+            #controls input, #controls button {
+                display: block;
+                margin-bottom: 10px;
+                width: 100%;
+            }
+
+        ##controls h3 {
+            margin-top: 0;
+        }
+
+        /* 右侧“场景物体”面板 */
+        #objectList {
+            position: absolute;
+            top: 10px;
+            right: 10px; /* 靠右定位 */
+            background: rgba(207, 255, 216, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            max-width: 225px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+            #objectList h3 {
+                margin-top: 0;
+            }
+
+            #objectList li {
+                list-style: none;
+                margin-bottom: 10px;
+                border: 1px solid #ccc;
+                padding: 5px;
+                border-radius: 3px;
+                cursor: pointer;
+            }
+
+                #objectList li.selected {
+                    background: #ddd;
+                }
+        
+    </style>
 </head>
 <body>
-  <canvas id="webgl-canvas"></canvas>
-  <div id="controls">
-    <p>使用 W/A/S/D 四向移动</p>
-    <p>使用 Q/E 上下移动</p>
-    <p>使用 鼠标拖动调整视角</p>
-    <button id="add-cube">添加正方体</button>
-    <button id="add-sphere">添加球体</button>
-    <button id="add-cylinder">添加圆柱体</button>
-    <p>注意，如果你点击添加发现无事发生，那他大概率是被藏在了上一个模型的内部，改变大小或者位置即可发现他。</p>
-    <!-- 新增光照强度滑块 -->
-    <label>
-      调整光照强度:
-      <input type="range" id="lightIntensity" min="0" max="3" step="0.1" value="1">
-    <label>
-      改变当前物体的大小:
-      <input type="range" id="size" min="0.1" max="5" step="0.1" value="1">
-    </label>
-    <p>改变当前物体的位置:</p>
-    <label>
-      Position X:
-      <input type="number" id="positionX" step="0.1" value="0">
-    </label>
-    <label>
-      Position Y:
-      <input type="number" id="positionY" step="0.1" value="0">
-    </label>
-    <label>
-      Position Z:
-      <input type="number" id="positionZ" step="0.1" value="-5">
-    </label>
-    <p>让当前物体旋转:</p>
-    <label>
-      Rotation X:
-      <input type="number" id="rotationX" step="1" value="0">
-    </label>
-    <label>
-      Rotation Y:
-      <input type="number" id="rotationY" step="1" value="0">
-    </label>
-    <label>
-      Rotation Z:
-      <input type="number" id="rotationZ" step="1" value="0">
-    </label>
-    <label>
-      输入你想隐藏的水印:
-      <input type="text" id="watermark" placeholder="Enter watermark">
-    </label>
-    </label>
-    <button id="export">导出带数字水印的模型文件</button>
-    <p>以下两步提取水印</p>
-    <input type="file" id="uploadModel" accept=".obj">
-    <button id="extractWatermark">提取改obj文件的水印</button>
-  </div>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.4.0/gl-matrix.js"></script>
-  <script src="app.js"></script>
+    <canvas id="webgl-canvas"></canvas>
+
+    <!-- 左侧控制面板 -->
+    <div id="controls">
+        <h3>欢迎使用此编辑器！</h3>
+        <p>使用 W/A/S/D 四向移动</p>
+        <p>使用 Q/E 上下移动</p>
+        <p>使用 鼠标拖动调整视角</p>
+        <button id="add-cube">添加正方体</button>
+        <button id="add-sphere">添加球体</button>
+        <button id="add-cylinder">添加圆柱体</button>
+        <p>注意，如果你点击添加发现无事发生，那他大概率是被藏在了上一个模型的内部，改变大小或者位置即可发现他。</p>
+        <!-- 新增光照强度滑块 -->
+        <label>
+            调整光照强度:
+            <input type="range" id="lightIntensity" min="0" max="3" step="0.1" value="1">
+        </label>
+        <label>
+            改变当前物体的大小:
+            <input type="range" id="size" min="0.1" max="5" step="0.1" value="1">
+        </label>
+        <p>改变当前物体的位置:</p>
+        <label>
+            Position X:
+            <input type="number" id="positionX" step="0.1" value="0">
+        </label>
+        <label>
+            Position Y:
+            <input type="number" id="positionY" step="0.1" value="0">
+        </label>
+        <label>
+            Position Z:
+            <input type="number" id="positionZ" step="0.1" value="0">
+        </label>
+        <p>让当前物体旋转:</p>
+        <label>
+            Rotation X:
+            <input type="number" id="rotationX" step="1" value="0">
+        </label>
+        <label>
+            Rotation Y:
+            <input type="number" id="rotationY" step="1" value="0">
+        </label>
+        <label>
+            Rotation Z:
+            <input type="number" id="rotationZ" step="1" value="0">
+        </label>
+        <label>
+            输入给模型的数字水印:
+            <input type="text" id="watermark" placeholder="Enter watermark">
+        </label>
+        <button id="export">导出带数字水印的模型文件</button>
+        <p>以下两步提取水印</p>
+        <input type="file" id="uploadModel" accept=".obj">
+        <button id="extractWatermark">提取改obj文件的水印</button>
+    </div>
+
+    <!-- 右侧“场景物体”面板 -->
+    <div id="objectList">
+        <h3>场景物体编辑</h3>
+        <p>选中物体后可以在左边修改物体信息</p>
+        <ul id="objectItems"></ul>
+    </div>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.4.0/gl-matrix.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
