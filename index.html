@@ -3,139 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WYC的在线建模编辑器</title>
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-        }
-
-        #webgl-canvas {
-            display: block;
-        }
-
-        /* 左侧控制面板 */
-        #controls {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: rgba(207, 255, 216, 0.8);
-            padding: 10px;
-            border-radius: 5px;
-            max-width: 200px;
-            max-height: 90vh; /* 限制最大高度，防止超出屏幕 */
-            overflow-y: auto; /* 启用滚动 */
-        }
-
-            #controls input, #controls button {
-                display: block;
-                margin-bottom: 10px;
-                width: 100%;
-            }
-
-        ##controls h3 {
-            margin-top: 0;
-        }
-
-        /* 右侧“场景物体”面板 */
-        #objectList {
-            position: absolute;
-            top: 10px;
-            right: 10px; /* 靠右定位 */
-            background: rgba(207, 255, 216, 0.8);
-            padding: 10px;
-            border-radius: 5px;
-            max-width: 225px;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-            #objectList h3 {
-                margin-top: 0;
-            }
-
-            #objectList li {
-                list-style: none;
-                margin-bottom: 10px;
-                border: 1px solid #ccc;
-                padding: 5px;
-                border-radius: 3px;
-                cursor: pointer;
-            }
-
-                #objectList li.selected {
-                    background: #ddd;
-                }
-        
-    </style>
+    <title>3D模型编辑器 - WYC</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css"/>
+    
 </head>
 <body>
+    <div class="navbar">
+        <div class="logo">
+            <i class="fas fa-cube logo-icon"></i>
+            <div class="logo-text">3D模型编辑器</div>
+        </div>
+        <div class="nav-buttons">
+            <button class="nav-btn" id="downloadObject"><i class="fa-solid fa-download"></i> 下载模型</button>
+            <button class="nav-btn" id="saveProject"><i class="fas fa-save"></i> 保存项目</button>
+            <button class="nav-btn" id="openProject"><i class="fas fa-folder-open"></i> 打开项目</button>
+            <button class="nav-btn" id="showHelp"><i class="fas fa-question-circle"></i> 帮助</button>
+            <input type="file" id="loadProjectFile" accept=".json" style="display: none;">
+        </div>
+        
+    </div>
+
     <canvas id="webgl-canvas"></canvas>
 
     <!-- 左侧控制面板 -->
     <div id="controls">
-        <h3>欢迎使用此编辑器！</h3>
-        <p>使用 W/A/S/D 四向移动</p>
-        <p>使用 Q/E 上下移动</p>
-        <p>使用 鼠标拖动调整视角</p>
-        <button id="add-cube">添加正方体</button>
-        <button id="add-sphere">添加球体</button>
-        <button id="add-cylinder">添加圆柱体</button>
-        <p>注意，如果你点击添加发现无事发生，那他大概率是被藏在了上一个模型的内部，改变大小或者位置即可发现他。</p>
-        <!-- 新增光照强度滑块 -->
-        <label>
-            调整光照强度:
-            <input type="range" id="lightIntensity" min="0" max="3" step="0.1" value="1">
-        </label>
-        <label>
-            改变当前物体的大小:
+        <div class="panel-header">
+            <i class="fas fa-sliders-h"></i>
+            <h3>编辑器控制面板</h3>
+        </div>
+
+        <div class="instructions">
+            <p><i class="fas fa-arrows-alt"></i> 使用 W/A/S/D 四向移动</p>
+            <p><i class="fas fa-arrow-up"></i> 使用 Q/E 上下移动</p>
+            <p><i class="fas fa-mouse-pointer"></i> 使用鼠标拖动调整视角</p>
+        </div>
+
+        <div class="warning">
+            <i class="fas fa-exclamation-triangle"></i> 注意：如果点击添加后没有看到新模型，可能是因为它被上一个模型遮挡。请尝试调整位置或大小。
+        </div>
+
+        <div class="shape-buttons">
+            <button class="shape-btn" id="add-cube">
+                <i class="fas fa-cube"></i>
+                <span>添加正方体</span>
+            </button>
+            <button class="shape-btn" id="add-sphere">
+                <i class="fas fa-circle"></i>
+                <span>添加球体</span>
+            </button>
+            <button class="shape-btn" id="add-cylinder">
+                <i class="fas fa-certificate"></i>
+                <span>添加圆柱体</span>
+            </button>
+        </div>
+
+        <div class="control-group">
+            <h4><i class="fas fa-expand"></i> 尺寸设置</h4>
+            <label>改变当前物体的大小:</label>
             <input type="range" id="size" min="0.1" max="5" step="0.1" value="1">
-        </label>
-        <p>改变当前物体的位置:</p>
-        <label>
-            Position X:
+        </div>
+
+        <div class="control-group">
+            <h4><i class="fas fa-arrows-alt"></i> 位置设置</h4>
+            <label>Position X:</label>
             <input type="number" id="positionX" step="0.1" value="0">
-        </label>
-        <label>
-            Position Y:
+            <label>Position Y:</label>
             <input type="number" id="positionY" step="0.1" value="0">
-        </label>
-        <label>
-            Position Z:
+            <label>Position Z:</label>
             <input type="number" id="positionZ" step="0.1" value="0">
-        </label>
-        <p>让当前物体旋转:</p>
-        <label>
-            Rotation X:
+        </div>
+
+        <div class="control-group">
+            <h4><i class="fas fa-sync-alt"></i> 旋转设置</h4>
+            <label>Rotation X:</label>
             <input type="number" id="rotationX" step="1" value="0">
-        </label>
-        <label>
-            Rotation Y:
+            <label>Rotation Y:</label>
             <input type="number" id="rotationY" step="1" value="0">
-        </label>
-        <label>
-            Rotation Z:
+            <label>Rotation Z:</label>
             <input type="number" id="rotationZ" step="1" value="0">
-        </label>
-        <label>
-            输入给模型的数字水印:
-            <input type="text" id="watermark" placeholder="Enter watermark">
-        </label>
-        <button id="export">导出带数字水印的模型文件</button>
-        <p>以下两步提取水印</p>
-        <input type="file" id="uploadModel" accept=".obj">
-        <button id="extractWatermark">提取改obj文件的水印</button>
+        </div>
+
+        <div class="control-group">
+            <h4><i class="fas fa-sun"></i> 光照设置</h4>
+            <label>调整光照强度:</label>
+            <input type="range" id="lightIntensity" min="0" max="3" step="0.1" value="1">
+        </div>
     </div>
 
     <!-- 右侧“场景物体”面板 -->
     <div id="objectList">
-        <h3>场景物体编辑</h3>
+        <div class="panel-header">
+            <i class="fas fa-cubes"></i>
+            <h3>场景物体编辑</h3>
+        </div>
         <p>选中物体后可以在左边修改物体信息</p>
-        <ul id="objectItems"></ul>
+        <ul id="objectItems">
+            
+        </ul>
     </div>
 
+    <div class="footer">
+        <p>备案号：<a href="https://beian.miit.gov.cn/" target="_blank">京ICP备2024051925号</a></p>
+    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.4.0/gl-matrix.js"></script>
-    <script src="app.js"></script>
+    <script src="shaders.js"></script>
+    <script src="camera.js"></script>
+    <script src="geometries.js"></script>
+    <script src="axes.js"></script>
+    <script src="objects.js"></script>
+    <script src="renderer.js"></script>
+    <script src="export.js"></script>
+    <script src="main.js"></script>
 </body>
 </html>
